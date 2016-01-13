@@ -22,7 +22,7 @@ public class Manager {
     private static void createFieldAndSetShips(Field field, Player player) {
 //        Создание поля и установка корабля
         field.init();
-        player.greeting();
+//        player.greeting();
         field.createShips();
         field.show();
     }

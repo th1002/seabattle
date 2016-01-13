@@ -8,6 +8,14 @@ import java.util.Scanner;
  */
 public class Comp extends Player {
     String name = "Comp";
+    Field field;
+    char[][] masVerify;
+
+    public Comp() {
+        this.field = new Field();
+        field.init();
+        this.masVerify = field.getMas();
+    }
 
     @Override
     public Coordinates getShot() {
@@ -15,12 +23,11 @@ public class Comp extends Player {
         Random random = new Random();
         int x = random.nextInt(10);
         int y = random.nextInt(10);
-        Field field = new Field();
-        char[][] masVerify = field.getMas();
-        while(masVerify[y][x]!='*'){
+        while(masVerify[y][x]!= '.'){
             x = random.nextInt(10);
             y = random.nextInt(10);
         }
+        masVerify[y][x] = '*';
         return new Coordinates(y, x);
     }
 
