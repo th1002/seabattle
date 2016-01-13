@@ -1,5 +1,7 @@
 package com.hook.seaBattle;
 
+import javafx.scene.control.Cell;
+
 import java.util.Scanner;
 
 /**
@@ -7,21 +9,18 @@ import java.util.Scanner;
  */
 public class Field {
     private static final int SIZE = 10;
-    private char[][] mas = new char[SIZE][SIZE];
-//    Игровые символы
-    private static final char COVER = '.';   //'░';
-    private static final char WOUND = 'X';   //'█';
-    private static final char PART_OF_SHIP = 'O';   //'▒';
-    private static final char BLOOMER = '*';
+    public enum CellType {COVER, WOUND, PART_OF_SHIP, BLOOMER}
 
-    public char[][] getMas() {
+    private CellType[][] mas = new CellType[SIZE][SIZE];
+
+    public CellType[][] getMas() {
         return mas;
     }
 //    Инициализация массива
     void init() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                mas[i][j] = COVER;
+                mas[i][j] = CellType.COVER;
             }
         }
     }
@@ -69,13 +68,13 @@ public class Field {
 //        Если вертикально на поле
         if (((currentX + calcShip.getCountPipe() - 1) <= SIZE) && calcShip.isVertical()) {
             for (int i = 0; i < calcShip.getCountPipe(); i++) {
-                mas[currentX + i - 1][currentY - 1] = PART_OF_SHIP;
+                mas[currentX + i - 1][currentY - 1] = CellType.PART_OF_SHIP;
             }
         }
 //        Если горизонтально на поле
         if (((currentY + calcShip.getCountPipe() - 1) <= SIZE) && !ship.isVertical())
             for (int i = 0; i < calcShip.getCountPipe(); i++) {
-                mas[currentX - 1][currentY + i - 1] = PART_OF_SHIP;
+                mas[currentX - 1][currentY + i - 1] = CellType.PART_OF_SHIP;
             }
     }
 //TODO X ПО ЧИСЛАМ Y ПО БУКВАМ!!! Х ОТ 0 ДО 10, Y ОТ 0 ДО 10!!!
@@ -133,11 +132,11 @@ public class Field {
                 int prevX = (tempX - 1) > 0 ? (tempX - 1) : 0;
                 int nextY = (tempY + 1) < SIZE ? (tempY + 1) : (SIZE - 1);
                 int prevY = (tempY - 1) > 0 ? (tempY - 1) : 0;
-                if (mas[tempX][tempY] == PART_OF_SHIP ||
-                        mas[prevX][tempY] == PART_OF_SHIP ||
-                        mas[tempX][nextY] == PART_OF_SHIP ||
-                        mas[nextX][tempY] == PART_OF_SHIP ||
-                        mas[tempX][prevY] == PART_OF_SHIP) {
+                if (mas[tempX][tempY] == CellType.PART_OF_SHIP ||
+                        mas[prevX][tempY] == CellType.PART_OF_SHIP ||
+                        mas[tempX][nextY] == CellType.PART_OF_SHIP ||
+                        mas[nextX][tempY] == CellType.PART_OF_SHIP ||
+                        mas[tempX][prevY] == CellType.PART_OF_SHIP) {
                     break;
                 } else {
                     countPipesEmulation++;
@@ -161,11 +160,11 @@ public class Field {
                 int prevX = (tempX - 1) > 0 ? (tempX - 1) : 0;
                 int nextY = (tempY + 1) < SIZE ? (tempY + 1) : (SIZE - 1);
                 int prevY = (tempY - 1) > 0 ? (tempY - 1) : 0;
-                if (mas[tempX][tempY] == PART_OF_SHIP ||
-                        mas[tempX][prevY] == PART_OF_SHIP ||
-                        mas[nextX][tempY] == PART_OF_SHIP ||
-                        mas[tempX][nextY] == PART_OF_SHIP ||
-                        mas[prevX][tempY] == PART_OF_SHIP) {
+                if (mas[tempX][tempY] == CellType.PART_OF_SHIP ||
+                        mas[tempX][prevY] == CellType.PART_OF_SHIP ||
+                        mas[nextX][tempY] == CellType.PART_OF_SHIP ||
+                        mas[tempX][nextY] == CellType.PART_OF_SHIP ||
+                        mas[prevX][tempY] == CellType.PART_OF_SHIP) {
                     break;
                 } else {
                     countPipesEmulation++;
@@ -186,7 +185,7 @@ public class Field {
         } else {
             switch (mas[position.getY()][position.getX()]) {
                 case PART_OF_SHIP:
-                    mas[position.getY()][position.getX()] = WOUND;
+                    mas[position.getY()][position.getX()] = CellType.WOUND;
                     System.out.println(isCrashed(position) ? "Поздравляем! Вы потопили корабль!" : "УРА! Вы подбили корабль!");
                     Player.setCountShotsOnTarget();
                     break;
@@ -199,7 +198,7 @@ public class Field {
                     Player.setCountRepeatShots();
                     break;
                 case COVER:
-                    mas[position.getY()][position.getX()] = BLOOMER;
+                    mas[position.getY()][position.getX()] = CellType.BLOOMER;
                     System.out.println("Мимо...");
                     Player.setCountShotsBloomers();
                     break;
@@ -219,13 +218,13 @@ public class Field {
         int currentY = position.getY();
 //        Проверка наличия неподбитых труб по направлениям
 //        ↑→↓←
-        if (mas[prevY][currentX] == PART_OF_SHIP || mas[currentY][nextX] == PART_OF_SHIP ||
-                mas[nextY][currentX] == PART_OF_SHIP || mas[currentY][prevX] == PART_OF_SHIP)
+        if (mas[prevY][currentX] == CellType.PART_OF_SHIP || mas[currentY][nextX] == CellType.PART_OF_SHIP ||
+                mas[nextY][currentX] == CellType.PART_OF_SHIP || mas[currentY][prevX] == CellType.PART_OF_SHIP)
             return false;
 //        ↑
-        if (mas[prevY][currentX] == WOUND)
-            while (mas[prevY][currentX]!= COVER) {
-                if(mas[prevY][currentX] == PART_OF_SHIP)
+        if (mas[prevY][currentX] == CellType.WOUND)
+            while (mas[prevY][currentX]!= CellType.COVER) {
+                if(mas[prevY][currentX] == CellType.PART_OF_SHIP)
                     return false;
                 if(prevY > 0)
                     prevY -= 1;
@@ -233,9 +232,9 @@ public class Field {
                     break;
             }
 //        →
-        if (mas[currentY][nextX] == WOUND)
-            while (mas[currentY][nextX] != COVER) {
-                if (mas[currentY][nextX] == PART_OF_SHIP)
+        if (mas[currentY][nextX] == CellType.WOUND)
+            while (mas[currentY][nextX] != CellType.COVER) {
+                if (mas[currentY][nextX] == CellType.PART_OF_SHIP)
                     return false;
                 if (nextX < (SIZE - 1))
                     nextX += 1;
@@ -243,9 +242,9 @@ public class Field {
                     break;
             }
 //        ↓
-        if (mas[nextY][currentX] == WOUND)
-            while (mas[nextY][currentX] != COVER) {
-                if (mas[nextY][currentX] == PART_OF_SHIP)
+        if (mas[nextY][currentX] == CellType.WOUND)
+            while (mas[nextY][currentX] != CellType.COVER) {
+                if (mas[nextY][currentX] == CellType.PART_OF_SHIP)
                     return  false;
                 if(nextY < (SIZE - 1))
                     nextY += 1;
@@ -253,9 +252,9 @@ public class Field {
                     break;
             }
 //        ←
-        if (mas[currentY][prevX] == WOUND)
-            while (mas[currentY][prevX] != COVER) {
-                if (mas[currentY][prevX] == PART_OF_SHIP)
+        if (mas[currentY][prevX] == CellType.WOUND)
+            while (mas[currentY][prevX] != CellType.COVER) {
+                if (mas[currentY][prevX] == CellType.PART_OF_SHIP)
                     return false;
                 if (prevX > 0)
                     prevX -= 1;
@@ -270,14 +269,13 @@ public class Field {
 //            Вывод поля на экран
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                showGraficElementsForBattleField(i, j);
-                System.out.print(mas[i][j] + "  ");
+                showGraficElementsForBattleField(i, j, mas[i][j]);
             }
             System.out.println();
         }
     }
 
-    private void showGraficElementsForBattleField(int i, int j) {
+    private void showGraficElementsForBattleField(int i, int j, CellType cellType) {
 //        Шкала долготы
         if(i == 0 && j == 0) {
             for (int a = 0; a < (SIZE + 1); a++) {
@@ -300,12 +298,29 @@ public class Field {
             else
                 System.out.print((i + 1) + "┃ ");
         }
+//        Отображение частей поля
+        switch (cellType) {
+            case COVER:
+                System.out.print(".  ");
+                break;
+            case WOUND:
+                System.out.print("X  ");
+                break;
+            case PART_OF_SHIP:
+                System.out.print("O  ");
+                break;
+            case BLOOMER:
+                System.out.print("*  ");
+                break;
+            default:
+                System.out.print("E  ");
+        }
     }
 //    Определение есть ли еще корабли на поле
     boolean isFall() {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (mas[i][j] == PART_OF_SHIP)
+                if (mas[i][j] == CellType.PART_OF_SHIP)
                     return true;
             }
         }

@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Comp extends Player {
     String name = "Comp";
     Field field;
-    char[][] masVerify;
+    Field.CellType[][] masVerify;
 
     public Comp() {
         this.field = new Field();
@@ -23,11 +23,11 @@ public class Comp extends Player {
         Random random = new Random();
         int x = random.nextInt(10);
         int y = random.nextInt(10);
-        while(masVerify[y][x]!= '.'){
+        while(masVerify[y][x]!= Field.CellType.COVER){
             x = random.nextInt(10);
             y = random.nextInt(10);
         }
-        masVerify[y][x] = '*';
+        masVerify[y][x] = Field.CellType.BLOOMER;
         return new Coordinates(y, x);
     }
 
